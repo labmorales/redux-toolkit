@@ -1,8 +1,5 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-import { fetchBaseQuery } from '@reduxjs/toolkit/query';
-export const api = createApi({
-  baseQuery: fetchBaseQuery({ baseUrl: '/api/v3' }),
-  tagTypes: [],
+import { appConfigApi as api } from './emptyApi';
+const injectedRtkApi = api.injectEndpoints({
   endpoints: (build) => ({
     getHealthcheck: build.query<GetHealthcheckApiResponse, GetHealthcheckApiArg>({
       query: () => ({ url: `/healthcheck` }),
@@ -77,11 +74,13 @@ export const api = createApi({
       query: (queryArg) => ({ url: `/user/${queryArg.username}`, method: 'DELETE' }),
     }),
   }),
+  overrideExisting: false,
 });
+export { injectedRtkApi as appConfigApi };
 export type GetHealthcheckApiResponse = /** status 200 OK */ {
   message: string;
 };
-export type GetHealthcheckApiArg = {};
+export type GetHealthcheckApiArg = void;
 export type UpdatePetApiResponse = /** status 200 Successful operation */ Pet;
 export type UpdatePetApiArg = {
   /** Update an existent pet in the store */
@@ -128,12 +127,12 @@ export type UploadFileApiArg = {
   petId: number;
   /** Additional Metadata */
   additionalMetadata?: string;
-  body: string;
+  body: Blob;
 };
 export type GetInventoryApiResponse = /** status 200 successful operation */ {
   [key: string]: number;
 };
-export type GetInventoryApiArg = {};
+export type GetInventoryApiArg = void;
 export type PlaceOrderApiResponse = /** status 200 successful operation */ Order;
 export type PlaceOrderApiArg = {
   order: Order;
@@ -165,7 +164,7 @@ export type LoginUserApiArg = {
   password?: string;
 };
 export type LogoutUserApiResponse = unknown;
-export type LogoutUserApiArg = {};
+export type LogoutUserApiArg = void;
 export type GetUserByNameApiResponse = /** status 200 successful operation */ User;
 export type GetUserByNameApiArg = {
   /** The name that needs to be fetched. Use user1 for testing.  */
@@ -197,7 +196,7 @@ export type Pet = {
   category?: Category;
   photoUrls: string[];
   tags?: Tag[];
-  status?: 'available' | 'pending' | 'sold';
+  status?: Status;
 };
 export type ApiResponse = {
   code?: number;
@@ -209,7 +208,7 @@ export type Order = {
   petId?: number;
   quantity?: number;
   shipDate?: string;
-  status?: 'placed' | 'approved' | 'delivered';
+  status?: Status2;
   complete?: boolean;
 };
 export type User = {
@@ -222,6 +221,16 @@ export type User = {
   phone?: string;
   userStatus?: number;
 };
+export enum Status {
+  Available = 'Available',
+  Pending = 'Pending',
+  Sold = 'Sold',
+}
+export enum Status2 {
+  Placed = 'Placed',
+  Approved = 'Approved',
+  Delivered = 'Delivered',
+}
 export const {
   useGetHealthcheckQuery,
   useUpdatePetMutation,
@@ -243,4 +252,4 @@ export const {
   useGetUserByNameQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
-} = api;
+} = injectedRtkApi;

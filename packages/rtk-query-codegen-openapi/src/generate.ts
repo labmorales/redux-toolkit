@@ -1,26 +1,28 @@
-import ts from 'typescript';
 import * as path from 'path';
-import { camelCase } from 'lodash';
+
 import ApiGenerator, {
   getOperationName as _getOperationName,
   getReferenceName,
   isReference,
   supportDeepObjects,
-} from '@rtk-query/oazapfts-patched/lib/codegen/generate';
-import {
-  createQuestionToken,
-  keywordType,
-  createPropertyAssignment,
-  isValidIdentifier,
-} from '@rtk-query/oazapfts-patched/lib/codegen/tscodegen';
-import type { OpenAPIV3 } from 'openapi-types';
-import { generateReactHooks } from './generators/react-hooks';
+} from 'oazapfts-labmorales/lib/codegen/generate';
 import type { EndpointMatcher, EndpointOverrides, GenerationOptions, OperationDefinition, TextMatcher } from './types';
-import { capitalize, getOperationDefinitions, getV3Doc, isQuery as testIsQuery, removeUndefined } from './utils';
-import { generateTagTypes } from './codegen';
-import type { ObjectPropertyDefinitions } from './codegen';
+import { capitalize, getOperationDefinitions, getV3Doc, removeUndefined, isQuery as testIsQuery } from './utils';
+import {
+  createPropertyAssignment,
+  createQuestionToken,
+  isValidIdentifier,
+  keywordType,
+} from 'oazapfts-labmorales/lib/codegen/tscodegen';
 import { generateCreateApiCall, generateEndpointDefinition, generateImportNode } from './codegen';
+
+import type { ObjectPropertyDefinitions } from './codegen';
+import type { OpenAPIV3 } from 'openapi-types';
+import { camelCase } from 'lodash';
 import { factory } from './utils/factory';
+import { generateReactHooks } from './generators/react-hooks';
+import { generateTagTypes } from './codegen';
+import ts from 'typescript';
 
 const generatedApiName = 'injectedRtkApi';
 
@@ -98,6 +100,7 @@ export async function generateApi(
 
   const apiGen = new ApiGenerator(v3Doc, {
     unionUndefined,
+    useEnumType: true,
   });
 
   const operationDefinitions = getOperationDefinitions(v3Doc).filter(operationMatches(filterEndpoints));
@@ -162,7 +165,8 @@ export async function generateApi(
           undefined
         ),
         ...Object.values(interfaces),
-        ...apiGen['aliases'],
+        ...apiGen.aliases,
+        ...apiGen.enumAliases,
         ...(hooks
           ? [
               generateReactHooks({
