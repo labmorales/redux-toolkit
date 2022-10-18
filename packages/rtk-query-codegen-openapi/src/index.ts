@@ -1,7 +1,8 @@
-import path from 'path';
-import fs from 'fs';
 import type { CommonOptions, ConfigFile, GenerationOptions, OutputFileOptions } from './types';
 import { isValidUrl, prettify } from './utils';
+
+import fs from 'fs';
+import path from 'path';
 export type { ConfigFile } from './types';
 
 export async function generateEndpoints(options: GenerationOptions): Promise<string | void> {
@@ -46,7 +47,7 @@ export function parseConfig(fullConfig: ConfigFile) {
  * That should prevent enums from running out of sync if both libraries use different TS versions.
  */
 function enforceOazapftsTsVersion<T>(cb: () => T): T {
-  const ozTsPath = require.resolve('typescript', { paths: [require.resolve('@rtk-query/oazapfts-patched')] });
+  const ozTsPath = require.resolve('typescript', { paths: [require.resolve('oazapfts-labmorales')] });
   const tsPath = require.resolve('typescript');
   const originalEntry = require.cache[ozTsPath];
   try {

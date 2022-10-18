@@ -1,9 +1,10 @@
-import ts from 'typescript';
-import { getOperationName } from '@rtk-query/oazapfts-patched/lib/codegen/generate';
+import type { ConfigFile, EndpointOverrides, OperationDefinition } from '../types';
 import { capitalize, isQuery } from '../utils';
-import type { OperationDefinition, EndpointOverrides, ConfigFile } from '../types';
-import { getOverrides } from '../generate';
+
 import { factory } from '../utils/factory';
+import { getOperationName } from 'oazapfts-labmorales/lib/codegen/generate';
+import { getOverrides } from '../generate';
+import ts from 'typescript';
 
 type HooksConfigOptions = NonNullable<ConfigFile['hooks']>;
 
